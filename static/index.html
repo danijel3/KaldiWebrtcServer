@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebRTC Kaldi ASR</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <link rel="stylesheet" href="/static/styles.css">
+
+</head>
+<body>
+
+<div class="jumbotron">
+    <div class="container">
+        <img class="display-4 float-left" src="/static/kaldi_logo.png">
+        <div>
+            <h1 class="display-4">Kaldi live speech recognition demo</h1>
+            <p class="lead">With WebRTC technology using <a href="https://github.com/aiortc/aiortc">aiortc</a> project</p>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <p>
+        <button class="btn btn-success" id="start" onclick="start()">Start</button>
+        <button class="btn btn-danger d-none" id="stop" onclick="stop()">Stop</button>
+    </p>
+    <div id="output"></div>
+
+    <script src="/static/client.js"></script>
+
+</div>
+</body>
+</html>
