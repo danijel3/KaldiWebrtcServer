@@ -17,8 +17,10 @@ class KaldiSink:
     2. __run_text_xfer transfers text from the Kaldi server to the browser
     """
 
-    def __init__(self, user_connection, kaldi_server):
+    def __init__(self, user_connection, kaldi_server, audio_debug=None):
         self.__resampler = AudioResampler(format='s16', layout='mono', rate=kaldi_server.samplerate)
+
+        self.__audio_debug = audio_debug
 
         self.__pc = user_connection
         self.__audio_task = None
@@ -66,6 +68,9 @@ class KaldiSink:
             frame = self.__resampler.resample(frame)
             data = frame.to_ndarray()
             self.__kaldi_writer.write(data.tobytes())
+            if self.__audio_debug:
+                self.__audio_debug.write(data.tobytes())
+                self.__audio_debug.flush()
 
     async def __run_text_xfer(self):
         while True:

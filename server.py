@@ -10,6 +10,8 @@ from kaldi import KaldiSink, kaldi_server_queue
 
 ROOT = Path(__file__).parent
 
+audio_debug_file = None
+
 
 async def index(request):
     content = open(str(ROOT / 'static' / 'index.html')).read()
@@ -28,7 +30,7 @@ async def offer(request):
 
     pc = RTCPeerConnection()
 
-    kaldi = KaldiSink(pc, kaldi_server)
+    kaldi = KaldiSink(pc, kaldi_server, audio_debug_file)
 
     @pc.on('datachannel')
     async def on_datachannel(channel):
@@ -63,8 +65,12 @@ async def offer(request):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--servers', help='Server configuration JSON')
+    parser.add_argument('--audio-debug', help='Filename to store raw audio being sent to Kaldi.')
 
     args = parser.parse_args()
+
+    if args.audio_debug:
+        audio_debug_file = open(args.audio_debug, 'wb')
 
     app = web.Application()
     app.router.add_get('/', index)

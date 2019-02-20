@@ -3,6 +3,6 @@
     "name": "default",
     "host": "localhost",
     "port": 5050,
-    "samplerate": 8000
+    "samplerate": 16000
   }
 ]

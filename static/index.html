@@ -16,19 +16,22 @@
         <img class="display-4 float-left" src="/static/kaldi_logo.png">
         <div>
             <h1 class="display-4">Kaldi live speech recognition demo</h1>
-            <p class="lead">With WebRTC technology using <a href="https://github.com/aiortc/aiortc">aiortc</a> project</p>
+            <p class="lead">With WebRTC technology using <a href="https://github.com/aiortc/aiortc">aiortc</a> project
+            </p>
         </div>
     </div>
 </div>
 <div class="container">
+
     <p>
         <button class="btn btn-success" id="start" onclick="start()">Start</button>
         <button class="btn btn-danger d-none" id="stop" onclick="stop()">Stop</button>
+        <span id="status" class="text-uppercase text-muted">Press start</span>
     </p>
+
     <div id="output"></div>
 
     <script src="/static/client.js"></script>
-
 </div>
 </body>
 </html>

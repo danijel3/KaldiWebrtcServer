@@ -5,10 +5,11 @@ var dc = null, dcInterval = null;
 transcriptionOutput = document.getElementById('output');
 start_btn = document.getElementById('start');
 stop_btn = document.getElementById('stop');
+statusField = document.getElementById('status');
 
 
 var lastTrans = document.createElement('span');
-lastTrans.innerText = '...';
+lastTrans.innerText = '💤';
 lastTrans.classList.add('partial');
 transcriptionOutput.appendChild(lastTrans);
 var imcompleteTrans = '';
@@ -22,6 +23,8 @@ function btn_show_stop() {
 function btn_show_start() {
     stop_btn.classList.add('d-none');
     start_btn.classList.remove('d-none');
+    lastTrans.innerText = '💤';
+    statusField.innerText = 'Press start';
 }
 
 
@@ -70,6 +73,9 @@ function negotiate() {
 function start() {
     btn_show_stop();
 
+    lastTrans.innerText = '💤';
+    statusField.innerText = 'Connecting...';
+
     var config = {
         sdpSemantics: 'unified-plan'
     };
@@ -88,9 +94,10 @@ function start() {
         console.log('Opened data channel');
     };
     dc.onmessage = function (evt) {
+        statusField.innerText = 'Listening...';
         var msg = evt.data;
         if (msg.endsWith('\n')) {
-            lastTrans.innerText = imcompleteTrans + msg.substring(0, msg.left - 1);
+            lastTrans.innerText = imcompleteTrans + msg.substring(0, msg.length - 1);
             lastTrans.classList.remove('partial');
             lastTrans = document.createElement('span');
             lastTrans.classList.add('partial');
@@ -99,13 +106,19 @@ function start() {
 
             imcompleteTrans = '';
         } else if (msg.endsWith('\r')) {
-            lastTrans.innerText = imcompleteTrans + msg.substring(0, msg.left - 1) + '...';
+            lastTrans.innerText = imcompleteTrans + msg.substring(0, msg.length - 1) + '...';
             imcompleteTrans = '';
         } else {
             imcompleteTrans += msg;
         }
     };
 
+    pc.oniceconnectionstatechange = function () {
+        if (pc.iceConnectionState == 'disconnected') {
+            console.log('Disconnected');
+            btn_show_start();
+        }
+    }
 
     var constraints = {
         audio: true,
@@ -124,6 +137,7 @@ function start() {
 }
 
 function stop() {
+
     // close data channel
     if (dc) {
         dc.close();
@@ -148,64 +162,3 @@ function stop() {
         pc.close();
     }, 500);
 }
-
-// function sdpFilterCodec(kind, codec, realSdp) {
-//     var allowed = [];
-//     var rtxRegex = new RegExp('a=fmtp:(\\d+) apt=(\\d+)\r$');
-//     var codecRegex = new RegExp('a=rtpmap:([0-9]+) ' + escapeRegExp(codec));
-//     var videoRegex = new RegExp('(m=' + kind + ' .*?)( ([0-9]+))*\\s*$');
-//
-//     var lines = realSdp.split('\n');
-//
-//     var isKind = false;
-//     for (var i = 0; i < lines.length; i++) {
-//         if (lines[i].startsWith('m=' + kind + ' ')) {
-//             isKind = true;
-//         } else if (lines[i].startsWith('m=')) {
-//             isKind = false;
-//         }
-//
-//         if (isKind) {
-//             var match = lines[i].match(codecRegex);
-//             if (match) {
-//                 allowed.push(parseInt(match[1]));
-//             }
-//
-//             match = lines[i].match(rtxRegex);
-//             if (match && allowed.includes(parseInt(match[2]))) {
-//                 allowed.push(parseInt(match[1]));
-//             }
-//         }
-//     }
-//
-//     var skipRegex = 'a=(fmtp|rtcp-fb|rtpmap):([0-9]+)';
-//     var sdp = '';
-//
-//     isKind = false;
-//     for (var i = 0; i < lines.length; i++) {
-//         if (lines[i].startsWith('m=' + kind + ' ')) {
-//             isKind = true;
-//         } else if (lines[i].startsWith('m=')) {
-//             isKind = false;
-//         }
-//
-//         if (isKind) {
-//             var skipMatch = lines[i].match(skipRegex);
-//             if (skipMatch && !allowed.includes(parseInt(skipMatch[2]))) {
-//                 continue;
-//             } else if (lines[i].match(videoRegex)) {
-//                 sdp += lines[i].replace(videoRegex, '$1 ' + allowed.join(' ')) + '\n';
-//             } else {
-//                 sdp += lines[i] + '\n';
-//             }
-//         } else {
-//             sdp += lines[i] + '\n';
-//         }
-//     }
-//
-//     return sdp;
-// }
-//
-// function escapeRegExp(string) {
-//     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
-// }

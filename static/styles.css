@@ -17,3 +17,8 @@
 #output span {
     margin-left: 1em;
 }
+
+#status {
+    font-size: 9pt;
+    margin-left: 10px;
+}
