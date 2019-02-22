@@ -1,5 +1,6 @@
 import argparse
 import json
+import logging
 from pathlib import Path
 
 from aiohttp import web
@@ -11,6 +12,8 @@ from kaldi import KaldiSink, kaldi_server_queue
 ROOT = Path(__file__).parent
 
 audio_debug_file = None
+
+logging.basicConfig(filename=str(ROOT / 'log' / 'server.log'), level=logging.INFO)
 
 
 async def index(request):
