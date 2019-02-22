@@ -77,10 +77,8 @@ class KaldiSink:
                 self.__pc.close()
                 await self.__ks.free()
                 return
-            print('text read')
             a = await self.__kaldi_reader.read(256)
             if self.__channel:
-                print('text send')
                 self.__channel.send(str(a, encoding='utf-8'))
 
 

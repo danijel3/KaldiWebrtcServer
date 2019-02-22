@@ -1,0 +1,10 @@
+version: '3.3'
+services:
+  kaldi:
+    image: "danijel3/kaldi-onlinefork:aspire"
+  web:
+    image: "danijel3/kaldi-webrtc"
+    volumes:
+      - ${PWD}/servers.json:/server/servers.json
+    ports:
+      - "8080:8080"
