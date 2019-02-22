@@ -74,7 +74,7 @@ class KaldiSink:
     async def __run_text_xfer(self):
         while True:
             if self.__kaldi_reader.at_eof():
-                self.__pc.close()
+                await self.__pc.close()
                 await self.__ks.free()
                 return
             a = await self.__kaldi_reader.read(256)
