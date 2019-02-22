@@ -2,7 +2,6 @@ import json
 import logging
 from asyncio import open_connection, create_task, Lock
 
-from aiortc.mediastreams import MediaStreamError
 from av.audio.resampler import AudioResampler
 
 log = logging.getLogger('')
@@ -61,13 +60,13 @@ class KaldiSink:
         while True:
             try:
                 frame = await self.__track.recv()
-            except MediaStreamError:
+                frame = self.__resampler.resample(frame)
+                data = frame.to_ndarray()
+                self.__kaldi_writer.write(data.tobytes())
+            except:
                 self.__kaldi_writer.close()
                 await self.__ks.free()
                 return
-            frame = self.__resampler.resample(frame)
-            data = frame.to_ndarray()
-            self.__kaldi_writer.write(data.tobytes())
             if self.__audio_debug:
                 self.__audio_debug.write(data.tobytes())
                 self.__audio_debug.flush()
@@ -78,8 +77,10 @@ class KaldiSink:
                 self.__pc.close()
                 await self.__ks.free()
                 return
+            print('text read')
             a = await self.__kaldi_reader.read(256)
             if self.__channel:
+                print('text send')
                 self.__channel.send(str(a, encoding='utf-8'))
 
 
