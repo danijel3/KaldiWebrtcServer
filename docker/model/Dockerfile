@@ -1,0 +1,9 @@
+FROM danijel3/kaldi-onlinefork
+MAINTAINER Danijel Koržinek <danijel@pja.edu.pl>
+
+COPY model /model
+
+ENTRYPOINT ["/kaldi/src/online2bin/online2-tcp-nnet3-decode-faster","--read-timeout=3","--samp-freq=16000","--frames-per-chunk=20",
+"--extra-left-context-initial=0","--frame-subsampling-factor=3","--config=/model/model/conf/online.conf","--min-active=200","--max-active=7000",
+"--beam=15","--lattice-beam=8","--acoustic-scale=1.0","/model/model/final.mdl","/model/graph/HCLG.fst","/model/graph/words.txt","5050"]
+
