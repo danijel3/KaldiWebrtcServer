@@ -4,7 +4,7 @@ from asyncio import open_connection, create_task, Lock
 
 from av.audio.resampler import AudioResampler
 
-log = logging.getLogger('')
+log = logging.getLogger('web')
 
 
 class KaldiSink:
@@ -73,10 +73,6 @@ class KaldiSink:
 
     async def __run_text_xfer(self):
         while True:
-            if self.__kaldi_reader.at_eof():
-                await self.__pc.close()
-                await self.__ks.free()
-                return
             a = await self.__kaldi_reader.read(256)
             if self.__channel:
                 self.__channel.send(str(a, encoding='utf-8'))

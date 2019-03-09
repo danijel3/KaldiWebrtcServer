@@ -12,6 +12,7 @@ ROOT = Path(__file__).parent
 
 audio_debug_file = None
 
+
 async def index(request):
     content = open(str(ROOT / 'static' / 'index.html')).read()
     return web.Response(content_type='text/html', text=content)
