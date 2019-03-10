@@ -29,6 +29,8 @@ class KaldiSink:
         self.__kaldi_reader = None
         self.__kaldi_writer = None
 
+        self.__channel = None
+
     async def set_audio_track(self, track):
         self.__track = track
         try:
