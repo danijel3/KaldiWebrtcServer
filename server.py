@@ -1,5 +1,7 @@
 import argparse
 import json
+import logging
+import sys
 from pathlib import Path
 
 from aiohttp import web
@@ -10,7 +12,14 @@ from kaldi import KaldiSink, kaldi_server_queue
 
 ROOT = Path(__file__).parent
 
-audio_debug_file = None
+root = logging.getLogger()
+root.setLevel(logging.INFO)
+
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.INFO)
+formatter = logging.Formatter('[%(asctime)s] %(name)s <%(levelname)s> %(message)s')
+handler.setFormatter(formatter)
+root.addHandler(handler)
 
 
 async def index(request):
@@ -30,7 +39,7 @@ async def offer(request):
 
     pc = RTCPeerConnection()
 
-    kaldi = KaldiSink(pc, kaldi_server, audio_debug_file)
+    kaldi = KaldiSink(pc, kaldi_server)
 
     @pc.on('datachannel')
     async def on_datachannel(channel):
@@ -54,6 +63,8 @@ async def offer(request):
     answer = await pc.createAnswer()
     await pc.setLocalDescription(answer)
 
+    await kaldi.start()
+
     return web.Response(
         content_type='application/json',
         text=json.dumps({
@@ -65,12 +76,8 @@ async def offer(request):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--servers', help='Server configuration JSON')
-    parser.add_argument('--audio-debug', help='Filename to store raw audio being sent to Kaldi.')
 
     args = parser.parse_args()
-
-    if args.audio_debug:
-        audio_debug_file = open(args.audio_debug, 'wb')
 
     app = web.Application()
     app.router.add_get('/', index)
