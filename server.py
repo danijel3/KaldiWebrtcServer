@@ -1,6 +1,7 @@
 import argparse
 import json
 import logging
+import ssl
 import sys
 from pathlib import Path
 
@@ -76,8 +77,18 @@ async def offer(request):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--servers', help='Server configuration JSON')
+    parser.add_argument('--cert-file', help='SSL certificate file (for HTTPS)')
+    parser.add_argument('--key-file', help='SSL key file (for HTTPS)')
+    parser.add_argument('--port', type=int, default=8080,
+                        help='Port for HTTP server (default: 8080)')
 
     args = parser.parse_args()
+
+    if args.cert_file:
+        ssl_context = ssl.SSLContext()
+        ssl_context.load_cert_chain(args.cert_file, args.key_file)
+    else:
+        ssl_context = None
 
     app = web.Application()
     app.router.add_get('/', index)
@@ -86,4 +97,4 @@ if __name__ == '__main__':
 
     kaldi_server_queue.load(args.servers)
 
-    web.run_app(app, port=8080)
+    web.run_app(app, port=args.port, ssl_context=ssl_context)
