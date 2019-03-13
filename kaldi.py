@@ -1,11 +1,12 @@
 import json
 import logging
-from asyncio import open_connection, create_task, Lock
+from asyncio import create_task, Lock, open_connection, wait_for, sleep
 
 from av.audio.resampler import AudioResampler
 
 log = logging.getLogger('web')
 
+logging.getLogger('asyncio').setLevel(logging.WARNING)
 
 class KaldiSink:
     """
@@ -16,10 +17,8 @@ class KaldiSink:
     2. __run_text_xfer transfers text from the Kaldi server to the browser
     """
 
-    def __init__(self, user_connection, kaldi_server, audio_debug=None):
+    def __init__(self, user_connection, kaldi_server):
         self.__resampler = AudioResampler(format='s16', layout='mono', rate=kaldi_server.samplerate)
-
-        self.__audio_debug = audio_debug
 
         self.__pc = user_connection
         self.__audio_task = None
@@ -33,6 +32,11 @@ class KaldiSink:
 
     async def set_audio_track(self, track):
         self.__track = track
+
+    async def set_text_channel(self, channel):
+        self.__channel = channel
+
+    async def start(self):
         try:
             self.__kaldi_reader, self.__kaldi_writer = await open_connection(host=self.__ks.host, port=self.__ks.port)
         except:
@@ -40,11 +44,9 @@ class KaldiSink:
             self.__pc.close()
             await self.__ks.free()
             return
-        self.__text_task = create_task(self.__run_text_xfer())
+        log.info(f'Connected to Kaldi server {self.__ks.host}:{self.__ks.port}...')
         self.__audio_task = create_task(self.__run_audio_xfer())
-
-    async def set_text_channel(self, channel):
-        self.__channel = channel
+        self.__text_task = create_task(self.__run_text_xfer())
 
     async def stop(self):
         if self.__audio_task is not None:
@@ -65,19 +67,19 @@ class KaldiSink:
                 frame = self.__resampler.resample(frame)
                 data = frame.to_ndarray()
                 self.__kaldi_writer.write(data.tobytes())
+                await self.__kaldi_writer.drain() #without this we won't catch any write exceptions
             except:
                 self.__kaldi_writer.close()
                 await self.__ks.free()
                 return
-            if self.__audio_debug:
-                self.__audio_debug.write(data.tobytes())
-                self.__audio_debug.flush()
 
     async def __run_text_xfer(self):
+        await sleep(1) # this is useful to
+        self.__channel.send('<s>\r') # this is only sent to inform the web UI we are ready to send data
+        # since the above token doesn't end with \n it will be erased once Kaldi recognizes something
         while True:
             a = await self.__kaldi_reader.read(256)
-            if self.__channel:
-                self.__channel.send(str(a, encoding='utf-8'))
+            self.__channel.send(str(a, encoding='utf-8'))
 
 
 class KaldiServer:
