@@ -1,6 +1,6 @@
 # Kaldi WebRTC server demo
 
-This is a demonstration of realtime online speech recognition using the [Kaldi](https://kaldi-asr.orgldi-asr.org) 
+This is a demonstration of realtime online speech recognition using the [Kaldi](https://kaldi-asr.org) 
 speech recognition toolkit. 
 
 It uses WebRTC to communicate between the server and the browser. It sends audio from the 
