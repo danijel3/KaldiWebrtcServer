@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   kaldi:
-    image: "danijel3/kaldi-onlinefork:aspire"
+    image: "danijel3/kaldi-online-tcp:aspire"
   web:
     image: "danijel3/kaldi-webrtc"
     volumes:
