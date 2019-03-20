@@ -32,12 +32,9 @@ concurrent browser sessions you intend to support.
 
 ## Kaldi
 
-This server relies on the connection with the `online2-tcp-nnet3-decode-faster` program. Currently, this program is available
-only on my personal fork of Kaldi here: https://github.com/danijel3/kaldi
-
-A [PR](https://github.com/kaldi-asr/kaldi/pull/2938) is still open for including it into the main Kaldi project.
-
-If you want to install it on your own, please follow the instructions provided in [docker/kaldi/Dockerfile](docker/kaldi/Dockerfile).
+This server relies on the connection with the `online2-tcp-nnet3-decode-faster` program. If you want to install it on 
+your own, please follow the official instructions for installing Kaldi. You can find a brief version of that in 
+[docker/kaldi/Dockerfile](docker/kaldi/Dockerfile).
 
 ## Docker
 
