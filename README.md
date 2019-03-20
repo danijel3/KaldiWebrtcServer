@@ -1,5 +1,7 @@
 # Kaldi WebRTC server demo
 
+![](demo.gif)
+
 This is a demonstration of realtime online speech recognition using the [Kaldi](https://kaldi-asr.org) 
 speech recognition toolkit. 
 
