@@ -7,7 +7,7 @@ RUN apt-get update && \
 		apt-get -y autoremove && apt-get -y clean && apt-get -y autoclean && rm -rf /var/lib/apt/lists/* && \
 		ln -s -f bash /bin/sh && ln -s -f /usr/bin/python2.7 /usr/bin/python2
 
-RUN git clone https://github.com/kaldi/kaldi /kaldi && \
+RUN git clone https://github.com/kaldi-asr/kaldi /kaldi && \
 		cd /kaldi/tools && make && find -name *.o -delete && \
 		cd /kaldi/src && ./configure && \
 		sed -i "s/-g /-O3 /g" /kaldi/src/kaldi.mk && \
