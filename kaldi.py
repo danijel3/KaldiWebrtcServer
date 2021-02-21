@@ -65,8 +65,7 @@ class KaldiSink:
             try:
                 frame = await self.__track.recv()
                 frame = self.__resampler.resample(frame)
-                data = frame.to_ndarray()
-                self.__kaldi_writer.write(data.tobytes())
+                self.__kaldi_writer.write(frame.planes[0].to_bytes())
                 await self.__kaldi_writer.drain() #without this we won't catch any write exceptions
             except:
                 self.__kaldi_writer.close()
