@@ -49,6 +49,9 @@ class KaldiSink:
         self.__text_task = create_task(self.__run_text_xfer())
 
     async def stop(self):
+        if self.__pc:
+            await self.__pc.close()
+            self.__pc = None
         if self.__audio_task is not None:
             self.__audio_task.cancel()
             self.__audio_task = None
@@ -67,9 +70,9 @@ class KaldiSink:
                 frame = self.__resampler.resample(frame)
                 self.__kaldi_writer.write(frame.planes[0].to_bytes())
                 await self.__kaldi_writer.drain() #without this we won't catch any write exceptions
-            except:
-                self.__kaldi_writer.close()
-                await self.__ks.free()
+            except Exception as e:
+                log.error(str(e))
+                await self.stop()
                 return
 
     async def __run_text_xfer(self):
